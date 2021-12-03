@@ -1,0 +1,44 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: k6-scripts
+data:
+  nginx-test.js: |
+    import http, { FileData } from 'k6/http'; 
+    import { check } from 'k6';
+    import { FormData } from 'https://jslib.k6.io/formdata/0.0.2/index.js';
+
+      export const options = {
+      discardResponseBodies: true,
+      scenarios: {
+        contacts: {
+          executor: 'per-vu-iterations',
+          vus: 1,
+          iterations: 100,
+          maxDuration: '10s',
+        },
+      },
+    };
+
+    const binFile = open('/data/pda765_2019-10-30_02.16.11.txt.gz','b');
+    
+    export default function () {
+      const responses = http.post('http://10.129.3.14:31485/contentListener', binFile 
+        );
+
+      check(responses, { 'is status 200': (r) => r.status === 200, });
+
+    }
+    
+
+    /*export default function () {
+
+     const payload = JSON.stringify({
+      email: 'aaa',
+      password: 'bbb',
+    });
+
+     const responses = http.post('http://loalhost:8888/contentListener', payload);
+
+     check(responses, { 'is status 200': (r) => r.status === 200, });
+    }*/
